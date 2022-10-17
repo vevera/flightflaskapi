@@ -23,7 +23,6 @@ def app_signup():
     data = request.get_json()
 
     check_user = flightsql.getting_user(data['username'])
-    print("veio", check_user)
     if check_user is not None:
         return {"inserted": False}
 
@@ -34,10 +33,10 @@ def app_signup():
     )
     user = flightsql.getting_user(data['username'])
 
-    image_64_decode = base64.b64decode(data["picture"])
+    # image_64_decode = base64.b64decode(data["picture"])
 
-    S3.create_bucket(data['username'])
-    S3.upload_to_bucket("profile.jpeg", image_64_decode, f"{data['username']}.s3")
+    # S3.create_bucket(data['username'])
+    # S3.upload_to_bucket("profile.jpeg", image_64_decode, f"{data['username']}.s3")
 
     flightsql.user_details(
                         data["firstName"],
@@ -46,8 +45,9 @@ def app_signup():
                         data["children"], 
                         data["babies"], 
                         data["email"], 
-                        user["id"],
-                        f"{data['username']}.s3-profile.jpeg")
+                        user["id"])
+
+    #f"{data['username']}.s3-profile.jpeg"
     
     return {"inserted": True}
 
@@ -63,5 +63,17 @@ def app_login():
 
     if check_user is not None:
         return {"inserted": True}
+
+    return {"inserted": False}
+
+
+@app.route("/update", methods = ["POST"])
+def update():
+    data = request.get_json()
+
+    flightsql.update_user(data)
+
+    # if check_user is not None:
+    #     return {"inserted": True}
 
     return {"inserted": False}

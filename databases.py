@@ -16,9 +16,9 @@ class FlightsSQL:
             # password="988991495",
             # dbname='postgres',
             # port=5432
-            host="database-1.cyya4blmbzcp.us-east-1.rds.amazonaws.com",
+            host="localhost",
             user="postgres",
-            password="988991495",
+            password="example",
             dbname="postgres",
             port=5432,
         )
@@ -56,11 +56,11 @@ class FlightsSQL:
             print("User does not exist: " + str(error))
             return None
 
-    def user_details(self, firstname, lastname, adults, child, baby, email, creds_id, profileref):
+    def user_details(self, firstname, lastname, adults, child, baby, email, creds_id):
         try:
             self.cur.execute(
-                "insert into user_details(firstname, lastname, adults, child, baby, email,creds_id, profiles3) values ('{}','{}',{},{},{},'{}',{},'{}')".format(
-                    firstname, lastname, adults, child, baby, email, creds_id, profileref
+                "insert into user_details(firstname, lastname, adults, child, baby, email,creds_id) values ('{}','{}',{},{},{},'{}',{})".format(
+                    firstname, lastname, adults, child, baby, email, creds_id
                 )
             )
             self.conn.commit()
@@ -122,6 +122,38 @@ class FlightsSQL:
             )
             self.conn.commit()
             print(f"{city}'s IATA updated!")
+
+        except Exception as error:
+            print("IATA Update Error: " + str(error))
+
+    def update_user(self, data):
+        print(""" 
+                UPDATE user_details
+                SET firstname = {}, 
+                lastname = {}, 
+                email = {}'
+                WHERE creds_id = {};
+                """.format(
+                data.get("firstname"), 
+                data.get("lastname"), 
+                data.get("email"), 
+                data.get("id")))
+        try:
+            self.cur.execute(
+                """ 
+                UPDATE user_details
+                SET firstname = '{}', 
+                lastname = '{}', 
+                email = '{}'
+                WHERE creds_id = {};
+                """.format(
+                data.get("firstname"), 
+                data.get("lastname"), 
+                data.get("email"), 
+                data.get("id")
+            )
+            )
+            self.conn.commit()
 
         except Exception as error:
             print("IATA Update Error: " + str(error))
