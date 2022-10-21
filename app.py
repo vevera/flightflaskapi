@@ -60,20 +60,22 @@ def app_login():
         data['username'],
         data['password'],
     )
-
+    
     if check_user is not None:
-        return {"inserted": True}
-
+        check_user["inserted"] = True
+        return check_user
+        
     return {"inserted": False}
+    
 
 
 @app.route("/update", methods = ["POST"])
 def update():
     data = request.get_json()
 
-    flightsql.update_user(data)
+    user_data = flightsql.update_user(data)
 
     # if check_user is not None:
     #     return {"inserted": True}
-
-    return {"inserted": False}
+    
+    return user_data

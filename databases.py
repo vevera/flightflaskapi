@@ -41,12 +41,15 @@ class FlightsSQL:
             self.cur.execute(
                 "select * from user_creds where username = '{}'".format(username)
             )
-            user = self.cur.fetchone()
-
+            user = dict(self.cur.fetchone())
             if user:
                 if check_password_hash(user["passwrd"], password):
                     print("Logged in successfully!\n")
-                    return user
+                    self.cur.execute(
+                        "select * from user_details where creds_id = {}".format(user["id"])
+                    )
+                    user_data = dict(self.cur.fetchone())
+                    return {**user, **user_data}
 
             else:
                 print("Wrong Username or Password! Please try again.\n")
@@ -127,17 +130,6 @@ class FlightsSQL:
             print("IATA Update Error: " + str(error))
 
     def update_user(self, data):
-        print(""" 
-                UPDATE user_details
-                SET firstname = {}, 
-                lastname = {}, 
-                email = {}'
-                WHERE creds_id = {};
-                """.format(
-                data.get("firstname"), 
-                data.get("lastname"), 
-                data.get("email"), 
-                data.get("id")))
         try:
             self.cur.execute(
                 """ 
@@ -154,9 +146,14 @@ class FlightsSQL:
             )
             )
             self.conn.commit()
-
+            self.cur.execute(
+                "select * from user_details as ud, user_creds as u where ud.creds_id = u.id and u.id = {}".format(data.get("id"))
+            )
+            user_data = dict(self.cur.fetchone())
+            return user_data
         except Exception as error:
             print("IATA Update Error: " + str(error))
+            return None
 
     def insert_details(
         self,
