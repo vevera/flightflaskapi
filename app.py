@@ -48,8 +48,9 @@ def app_signup():
                         user["id"])
 
     #f"{data['username']}.s3-profile.jpeg"
-    
-    return {"inserted": True}
+    response = flightsql.auth_user(data['username'], data['password'])
+    response["inserted"] = True
+    return response
 
 
 @app.route("/login", methods = ["POST"])
