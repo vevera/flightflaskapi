@@ -1,17 +1,25 @@
 import sys
 import threading
-import boto3 as aws
-import logging
-from botocore.exceptions import ClientError
+import io
+
 import os
 
 
+
+from minio import Minio
+from minio.error import S3Error
+from minio import datatypes
 class S3:
     """
         Class responsible for the AWS S3 integration.
     """
-    resource = aws.resource("s3")
-    client = aws.client("s3")
+    #resource = aws.resource("s3")
+    client = Minio(
+        "127.0.0.1:9000",
+        access_key="admin",
+        secret_key="admin123",
+        secure=False
+    )
 
     @staticmethod
     def create_bucket(username):
@@ -27,12 +35,17 @@ class S3:
         """
 
         # Create bucket
-        try:
-            S3.client.create_bucket(Bucket=f'{username}.s3')
-            print(f"Creating the {username}\'s storage. Please give a moment to access!")
-        except ClientError as e:
-            logging.error(e)
-            return False
+        # try:
+        #     S3.client.make_bucket(f'{username}.s3')
+        #     print(f"Creating the {username}\'s storage. Please give a moment to access!")
+        # except:
+        #     return False
+
+        found = S3.client.bucket_exists(f'{username}.s3')
+        if not found:
+            S3.client.make_bucket(f'{username}.s3')
+        else:
+            print("Bucket 'asiatrip' already exists")
         return True
 
     @staticmethod
@@ -40,20 +53,25 @@ class S3:
 
         # Retrieve the list of existing buckets
         response = S3.client.list_buckets()
+        print(response)
         # Output the bucket names
-        for bucket in response['Buckets']:
-            if f"{username}.s3" != bucket["Name"]:
-                pass
-            else:
-                return bucket["Name"]
+        # for bucket in response['Buckets']:
+        #     if f"{username}.s3" != bucket["Name"]:
+        #         pass
+        #     else:
+        #         return bucket["Name"]
 
     @staticmethod
     def listing_files(bucket):
-        files = S3.client.list_objects(Bucket=bucket)
-        files_list = []
-        for file in files["Contents"]:
-            files_list.append(file["Key"])
-        return files_list
+        files = S3.client.list_objects(bucket)
+        for f in files:
+            print(f.object_name)
+     
+        #print(files)
+        # files_list = []
+        # for file in files["Contents"]:
+        #     files_list.append(file["Key"])
+        # return files_list
 
     @staticmethod
     def batch_upload(path, bucket):
@@ -79,16 +97,27 @@ class S3:
         #     data = open(f"{path}/{file}", 'rb')
 
             # Upload
-        S3.resource.Bucket(f"{bucket}").put_object(Key=name, Body=data)
+
+        
+        stream = io.BytesIO(data)
+        S3.client.put_object(bucket, name, stream , length=len(data))
+        #S3.resource.Bucket(f"{bucket}").put_object(Key=name, Body=data)
 
         print("File uploaded!")
 
     @staticmethod
-    def download_bucket(bucket, path):
-        files = S3.listing_files(bucket)
-        for file in files:
-            filename = f"{path}/" + file
-            S3.client.download_file(bucket, file, filename, Callback=ProgressPercentage(file, bucket))
+    def url_from_file(bucket, file):
+        # try:
+        response = S3.client.presigned_get_object(bucket, file)
+        return response
+            # Read data from response.
+        # finally:
+        #     response.close()
+        #     response.release_conn()
+        # files = S3.listing_files(bucket)
+        # for file in files:
+        #     filename = f"{path}/" + file
+        #     S3.client.download_file(bucket, file, filename, Callback=ProgressPercentage(file, bucket))
 
         print("\nDownload Successfully!\n")
 

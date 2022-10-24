@@ -12,6 +12,10 @@ CORS(app)
 
 @app.route("/")
 def hello_world():
+    # S3.listing_bucket("teste")
+    # S3.listing_files("asiatrip")
+    # S3.url_from_file("asiatrip", "turtle.jpg")
+    #S3.create_bucket("fabio.s3")
     return "<p>Welcome to Flight Search API!</p>"
 
 
@@ -33,10 +37,10 @@ def app_signup():
     )
     user = flightsql.getting_user(data['username'])
 
-    # image_64_decode = base64.b64decode(data["picture"])
+    image_64_decode = base64.b64decode(data["picture"])
 
-    # S3.create_bucket(data['username'])
-    # S3.upload_to_bucket("profile.jpeg", image_64_decode, f"{data['username']}.s3")
+    S3.create_bucket(data['username'].lower())
+    S3.upload_to_bucket("profile.jpeg", image_64_decode, f"{data['username'].lower()}.s3")
 
     flightsql.user_details(
                         data["firstName"],
@@ -45,11 +49,13 @@ def app_signup():
                         data["children"], 
                         data["babies"], 
                         data["email"], 
-                        user["id"])
+                        user["id"],
+                        )
 
     #f"{data['username']}.s3-profile.jpeg"
     response = flightsql.auth_user(data['username'], data['password'])
     response["inserted"] = True
+    response["pic"] = S3.url_from_file(f"{data['username'].lower()}.s3", "profile.jpeg")
     return response
 
 
@@ -64,6 +70,7 @@ def app_login():
     
     if check_user is not None:
         check_user["inserted"] = True
+        check_user["pic"] = S3.url_from_file(f"{data['username'].lower()}.s3", "profile.jpeg")
         return check_user
         
     return {"inserted": False}

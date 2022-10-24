@@ -5,6 +5,7 @@ import boto3 as aws
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
+
 class FlightsSQL:
     """This class is responsible for connecting to the Database"""
 
