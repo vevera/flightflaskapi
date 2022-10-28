@@ -17,7 +17,7 @@ class S3:
     client = Minio(
         "127.0.0.1:9000",
         access_key="admin",
-        secret_key="admin123",
+        secret_key="admin1234",
         secure=False
     )
 

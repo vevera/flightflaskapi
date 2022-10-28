@@ -174,7 +174,7 @@ class Back:
                         short_url = shortener.tinyurl.short(business.url)
 
                         # Terminal Return
-                        terminal_return(business, origin_code, dest_code, business.price)
+                        #terminal_return(business, origin_code, dest_code, business.price)
 
                         # Insert Flight Details on a SQL Table
                         # fdb.insert_details(business.departure_date, business.return_date,
@@ -184,9 +184,10 @@ class Back:
                         # fdb.update_season()
 
                         # Insert Dynamo Table Items
-                        fdyn.Dynamo.insert_values("business", business.search_id, origin_city, business.departure_number, business.departure_date,
-                                                  dest_city, business.return_number, business.return_date, business.total_days,
-                                                  business.seat, business.price, short_url)
+
+                        # fdyn.Dynamo.insert_values("business", business.search_id, origin_city, business.departure_number, business.departure_date,
+                        #                           dest_city, business.return_number, business.return_date, business.total_days,
+                        #                           business.seat, business.price, short_url)
 
                         print("Dynamo Table Updated")
 
@@ -200,7 +201,7 @@ class Back:
                         short_url = shortener.tinyurl.short(economy.url)
 
                         # Terminal Return
-                        terminal_return(economy, origin_code, dest_code, economy.price)
+                        #terminal_return(economy, origin_code, dest_code, economy.price)
 
                         # # Insert Flight Details on a SQL Table
                         # fdb.insert_details(economy.departure_date, economy.return_date,
@@ -210,9 +211,9 @@ class Back:
                         # fdb.update_season()
 
                         # Insert Dynamo Table Items
-                        fdyn.Dynamo.insert_values("economy", economy.search_id, origin_city, economy.departure_number, economy.departure_date,
-                                                  dest_city, economy.return_number, economy.return_date, economy.total_days,
-                                                  economy.seat, economy.price, short_url)
+                        # fdyn.Dynamo.insert_values("economy", economy.search_id, origin_city, economy.departure_number, economy.departure_date,
+                        #                           dest_city, economy.return_number, economy.return_date, economy.total_days,
+                        #                           economy.seat, economy.price, short_url)
                         print("Dynamo Table Updated")
 
                         # Email Message
@@ -228,5 +229,5 @@ class Back:
                     continue
 
 
-if __name__ == '__main__':
-    Back()
+# if __name__ == '__main__':
+#     Back()

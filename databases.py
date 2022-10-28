@@ -19,7 +19,7 @@ class FlightsSQL:
             # port=5432
             host="localhost",
             user="postgres",
-            password="example",
+            password="postgres",
             dbname="postgres",
             port=5432,
         )
